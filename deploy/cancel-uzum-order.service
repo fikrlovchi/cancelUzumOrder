@@ -1,0 +1,10 @@
+[Unit]
+Description=Uzum CANCELED -> MoySklad bekor qilish (bir martalik ishga tushirish)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/root/cancelUzumOrder
+ExecStart=/usr/bin/node /root/cancelUzumOrder/src/index.js

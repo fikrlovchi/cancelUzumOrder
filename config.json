@@ -1,0 +1,19 @@
+{
+  "uzum": {
+    "baseUrl": "https://api-seller.uzum.uz/api/seller-openapi",
+    "status": "CANCELED",
+    "scheme": "FBS",
+    "pageSize": 50,
+    "maxPagesPerSweep": 40,
+    "maxRetry": 3
+  },
+  "moysklad": {
+    "baseUrl": "https://api.moysklad.ru/api/remap/1.2",
+    "targetStateHref": "https://api.moysklad.ru/api/remap/1.2/entity/customerorder/metadata/states/a47989ee-97e3-11ed-0a80-0ca1009761c9",
+    "requestDelayMs": 250,
+    "maxAttemptsPerOrder": 100
+  },
+  "state": {
+    "pruneDays": 30
+  }
+}

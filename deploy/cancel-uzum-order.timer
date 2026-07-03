@@ -1,0 +1,16 @@
+[Unit]
+Description=Uzum CANCELED -> MoySklad bekor qilishni har 10 daqiqada ishga tushiradi
+
+[Timer]
+# Server yongandan 2 daqiqa o'tib birinchi marta, keyin har 600 soniyada.
+# Interval panel orqali o'zgartiriladi (OnUnitActiveSec qiymati soniyalarda
+# saqlanishi shart — panel shu formatni o'qiydi va yozadi).
+OnBootSec=2min
+OnUnitActiveSec=600
+# Agar oldingi ishga tushirish hali tugamagan bo'lsa, yangi nusxa boshlanmaydi
+# (systemd service allaqachon "active" bo'lsa timer uni qayta ishga tushirmaydi).
+AccuracySec=30s
+Unit=cancel-uzum-order.service
+
+[Install]
+WantedBy=timers.target

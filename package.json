@@ -1,0 +1,16 @@
+{
+  "name": "canceluzumorder",
+  "version": "1.0.0",
+  "description": "Uzum PENDING_DELIVERY buyurtmalarini MoySklad'da belgilangan statusga o'tkazadi",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
