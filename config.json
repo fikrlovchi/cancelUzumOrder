@@ -15,5 +15,9 @@
   },
   "state": {
     "pruneDays": 30
+  },
+  "run": {
+    "maxDurationMs": 300000,
+    "saveStateEvery": 20
   }
 }

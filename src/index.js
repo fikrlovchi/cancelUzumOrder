@@ -40,6 +40,7 @@ async function run() {
     sweepErrors: 0,
     msErrors: 0,
     budgetExhausted: false,
+    timeBudgetExceeded: false,
   };
 
   // ===== 1-BOSQICH: Uzum'dan buyurtma ID'larini yig'ish =====
@@ -77,8 +78,18 @@ async function run() {
   // Sweep xato bergan yoki limit tugagan bo'lsa ham, oldingi run'larda topilgan
   // buyurtmalar bu bosqichda baribir qayta ishlanadi (Uzum so'rovi sarflanmaydi).
   const pending = Object.entries(state.orders).filter(([, o]) => o.status === "pending");
+  const runDeadline = Date.now() + config.run.maxDurationMs;
+  let processedSinceSave = 0;
 
   for (const [orderId, order] of pending) {
+    if (Date.now() > runDeadline) {
+      stats.timeBudgetExceeded = true;
+      logger.info(
+        `Vaqt byudjeti (${config.run.maxDurationMs}ms) tugadi — qolgan buyurtmalar keyingi run'da davom etadi.`
+      );
+      break;
+    }
+
     try {
       const msOrder = await moysklad.findByExternalCode(orderId, msToken, config.moysklad);
 
@@ -118,6 +129,14 @@ async function run() {
       logger.error(`Buyurtma ${orderId}: ${e.message}`);
     }
 
+    // Uzoq run o'rtada uzilib qolsa ham (server restart, timeout) progress
+    // yo'qolmasligi uchun oraliq saqlash.
+    processedSinceSave++;
+    if (processedSinceSave >= config.run.saveStateEvery) {
+      stateStore.save(state);
+      processedSinceSave = 0;
+    }
+
     await sleep(config.moysklad.requestDelayMs);
   }
 
@@ -131,7 +150,7 @@ function deriveStatus(stats) {
   const errorCount = stats.sweepErrors + stats.msErrors + stats.givenUp;
   const successCount = stats.updated + stats.alreadyDone;
   if (errorCount > 0 && successCount === 0) return "error";
-  if (errorCount > 0 || stats.budgetExhausted) return "partial";
+  if (errorCount > 0 || stats.budgetExhausted || stats.timeBudgetExceeded) return "partial";
   return "success";
 }
 
@@ -144,6 +163,7 @@ function buildSummary(stats) {
     `${stats.sweepErrors + stats.msErrors + stats.givenUp} xato`,
   ];
   if (stats.budgetExhausted) parts.push("Uzum kunlik limiti tugadi");
+  if (stats.timeBudgetExceeded) parts.push("vaqt byudjeti tugadi, qolgani keyingi run'da");
   return parts.join(", ");
 }
 
